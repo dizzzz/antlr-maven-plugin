@@ -25,6 +25,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
+import org.apache.maven.doxia.sink.render.RenderingContext;
 import org.apache.maven.doxia.siterenderer.Renderer;
 import org.apache.maven.doxia.siterenderer.sink.SiteRendererSink;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -32,7 +33,6 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.reporting.AbstractMavenReportRenderer;
 import org.apache.maven.reporting.MavenReport;
 import org.apache.maven.reporting.MavenReportException;
-import org.apache.maven.reporting.sink.SinkFactory;
 import org.apache.maven.wagon.PathUtils;
 import org.codehaus.doxia.sink.Sink;
 import org.codehaus.plexus.i18n.I18N;
@@ -218,7 +218,8 @@ public class AntlrHtmlReport
     {
         try
         {
-            SiteRendererSink sink = SinkFactory.createSink( getReportOutputDirectory(), getOutputName() + ".html" );
+            RenderingContext context = new RenderingContext( getReportOutputDirectory(), getOutputName() + ".html" );
+            SiteRendererSink sink = new SiteRendererSink( context );
 
             generate( sink, Locale.getDefault() );
         }

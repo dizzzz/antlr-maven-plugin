@@ -82,7 +82,7 @@ public abstract class AbstractAntlrMojo
     /**
      * The maven project's helper.
      *
-     * @parameter expression="${component.org.apache.maven.project.MavenProjectHelper}"
+     * @component role="org.apache.maven.project.MavenProjectHelper"
      * @required
      * @readonly
      */

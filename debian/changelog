@@ -1,3 +1,15 @@
+antlr-maven-plugin (2.2-1) unstable; urgency=low
+
+  * New upstream release
+  * Refreshed the patch
+  * Added a dependency on libcommons-exec-java
+  * Updated Standards-Version to 3.9.4 (no changes)
+  * debian/copyright: Updated the Format URI to the version 1.0
+  * Use canonical URLs for the Vcs-* fields
+  * Added a lintian override for the javalib-but-no-public-jars warning
+
+ -- Emmanuel Bourg <ebourg@apache.org>  Wed, 03 Jul 2013 14:40:27 +0200
+
 antlr-maven-plugin (2.1-2) unstable; urgency=low
 
   * Team upload.

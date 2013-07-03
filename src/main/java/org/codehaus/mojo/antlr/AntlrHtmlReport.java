@@ -41,9 +41,9 @@ import org.codehaus.plexus.util.StringUtils;
 
 /**
  * Generates Antlr documentation from grammar files.
- *
+ * 
  * @author <a href="mailto:vincent.siveton@gmail.com">Vincent Siveton</a>
- * @version $Id: AntlrHtmlReport.java 6341 2008-02-25 08:31:17Z dholroyd $
+ * @version $Id: AntlrHtmlReport.java 13111 2010-11-16 22:16:36Z pgier $
  * @goal html
  * @see <a href="http://www.antlr2.org/doc/options.html#Command%20Line%20Options">Command Line Options</a>
  */
@@ -57,36 +57,35 @@ public class AntlrHtmlReport
 
     /**
      * Generates the site report
-     *
+     * 
      * @component
      */
     private Renderer siteRenderer;
 
     /**
      * Internationalization.
-     *
+     * 
      * @component
      */
     protected I18N i18n;
 
     /**
      * Specifies the destination directory where Antlr generates HTML files.
-     *
-     * @parameter expression="${project.build.directory}/generated-site/antlr"
-     * @required
+     * 
+     * @parameter default-value="${project.build.directory}/generated-site/antlr"
      */
     private File reportOutputDirectory;
 
     /**
      * The name of the Antlr report.
-     *
+     * 
      * @parameter expression="${name}" default-value="Antlr Grammars"
      */
     private String name;
 
     /**
      * The description of the Antlr report.
-     *
+     * 
      * @parameter expression="${description}" default-value="Generated Antlr report from grammars."
      */
     private String description;

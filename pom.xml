@@ -1,12 +1,12 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <parent>
     <groupId>org.codehaus.mojo</groupId>
-    <artifactId>mojo</artifactId>
-    <version>15</version>
+    <artifactId>mojo-parent</artifactId>
+    <version>27</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>antlr-maven-plugin</artifactId>
-  <version>2.1</version>
+  <version>2.2</version>
   <packaging>maven-plugin</packaging>
 
   <name>Maven ANTLR Plugin</name>
@@ -27,9 +27,9 @@
 
   <!--  Different from the parent -->
   <scm>
-    <connection>scm:svn:https://svn.codehaus.org/mojo/tags/antlr-maven-plugin-2.1</connection>
-    <developerConnection>scm:svn:https://svn.codehaus.org/mojo/tags/antlr-maven-plugin-2.1</developerConnection>
-    <url>https://svn.codehaus.org/mojo/tags/antlr-maven-plugin-2.1</url>
+    <connection>scm:svn:http://svn.codehaus.org/mojo/tags/antlr-maven-plugin-2.2</connection>
+    <developerConnection>scm:svn:https://svn.codehaus.org/mojo/tags/antlr-maven-plugin-2.2</developerConnection>
+    <url>http://fisheye.codehaus.org/browse/mojo/tags/antlr-maven-plugin-2.2</url>
   </scm>
 
   <issueManagement>
@@ -103,7 +103,12 @@
       <artifactId>wagon-provider-api</artifactId>
       <version>1.0-beta-1</version>
     </dependency>
-
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-exec</artifactId>
+      <version>1.0</version>
+    </dependency>
+    
     <dependency>
         <groupId>org.apache.maven.shared</groupId>
         <artifactId>maven-plugin-testing-harness</artifactId>
@@ -111,32 +116,8 @@
         <scope>test</scope>
     </dependency>
   </dependencies>
-
+  
   <build>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <artifactId>maven-jar-plugin</artifactId>
-          <version>2.1</version>
-        </plugin>
-        <plugin>
-          <artifactId>maven-compiler-plugin</artifactId>
-          <version>2.0.2</version>
-        </plugin>
-        <plugin>
-          <artifactId>maven-resources-plugin</artifactId>
-          <version>2.2</version>
-        </plugin>
-        <plugin>
-          <artifactId>maven-surefire-plugin</artifactId>
-          <version>2.3</version>
-        </plugin>
-        <plugin>
-          <artifactId>maven-clean-plugin</artifactId>
-          <version>2.2</version>
-        </plugin>
-      </plugins>
-    </pluginManagement>
     <plugins>
       <plugin>
         <groupId>org.codehaus.modello</groupId>
@@ -154,17 +135,12 @@
           <model>src/main/mdo/antlrOptions.mdo</model>
         </configuration>
       </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-site-plugin</artifactId>
-        <version>2.0-beta-5</version>
-      </plugin>
     </plugins>
   </build>
 
   <profiles>
     <profile>
-      <id>integration-tests</id>
+      <id>run-its</id>
       <activation>
         <property>
           <name>maven.test.skip</name>
@@ -175,50 +151,11 @@
         <plugins>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-clean-plugin</artifactId>
-            <configuration>
-              <filesets>
-                <fileset>
-                  <directory>src/it</directory>
-                  <includes>
-                    <include>**/target</include>
-                  </includes>
-                </fileset>
-              </filesets>
-            </configuration>
-          </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-install-plugin</artifactId>
-            <version>2.2</version>
-            <executions>
-              <execution>
-                <id>it-test</id>
-                <phase>pre-integration-test</phase>
-                <goals>
-                  <goal>install-file</goal>
-                </goals>
-                <configuration>
-                  <file>${project.build.directory}/${project.build.finalName}.jar</file>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>${project.artifactId}</artifactId>
-                  <version>${project.version}</version>
-                  <packaging>${project.packaging}</packaging>
-                  <pomFile>${basedir}/pom.xml</pomFile>
-                  <createChecksum>true</createChecksum>
-                  <localRepositoryPath>${project.build.directory}/local-repo</localRepositoryPath>
-                  <localRepositoryId>it-local-repo</localRepositoryId>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-invoker-plugin</artifactId>
-            <version>1.0</version>
+            <version>1.3</version>
             <configuration>
               <debug>true</debug>
-              <streamLogs>true</streamLogs>
+              <cloneProjectsTo>target/it</cloneProjectsTo>
               <projectsDirectory>src/it</projectsDirectory>
               <pomIncludes>
                 <pomInclude>**/pom.xml</pomInclude>
@@ -234,6 +171,7 @@
                 <id>integration-test</id>
                 <phase>integration-test</phase>
                 <goals>
+                  <goal>install</goal>
                   <goal>run</goal>
                 </goals>
               </execution>

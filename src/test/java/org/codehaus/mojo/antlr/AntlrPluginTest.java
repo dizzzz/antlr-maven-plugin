@@ -41,7 +41,7 @@ import org.codehaus.plexus.util.FileUtils;
  * <code>Unit tests</code> of Antlr plugin
  *
  * @author <a href="mailto:vincent.siveton@gmail.com">Vincent Siveton</a>
- * @version $Id: AntlrPluginTest.java 5686 2007-12-06 17:04:41Z jdcasey $
+ * @version $Id: AntlrPluginTest.java 6588 2008-03-28 12:22:57Z bentmann $
  */
 public class AntlrPluginTest
     extends AbstractMojoTestCase

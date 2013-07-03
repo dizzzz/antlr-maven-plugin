@@ -29,12 +29,12 @@ import org.apache.maven.plugin.MojoExecutionException;
 // START SNIPPET: generate-sources-0
 /**
  * Generates files based on grammar files with Antlr tool.
- *
+ * 
  * @goal generate
  * @phase generate-sources
  * @requiresDependencyResolution compile
  * @author <a href="mailto:vincent.siveton@gmail.com">Vincent Siveton</a>
- * @version $Id: AntlrPlugin.java 4581 2007-07-18 11:53:46Z vsiveton $
+ * @version $Id: AntlrPlugin.java 13111 2010-11-16 22:16:36Z pgier $
  */
 public class AntlrPlugin
     extends AbstractAntlrMojo
@@ -47,10 +47,11 @@ public class AntlrPlugin
     {
         executeAntlr();
     }
-// END SNIPPET: generate-sources-0
-//----------------------------------------------------------------------
-// Don't remove this snippet
-//----------------------------------------------------------------------
+
+    // END SNIPPET: generate-sources-0
+    // ----------------------------------------------------------------------
+    // Don't remove this snippet
+    // ----------------------------------------------------------------------
 
     /**
      * @see org.codehaus.mojo.antlr.AbstractAntlrMojo#addArgs(java.util.List)

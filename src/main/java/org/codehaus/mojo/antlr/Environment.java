@@ -1,5 +1,3 @@
-package org.codehaus.mojo.antlr.stubs;
-
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -19,35 +17,22 @@ package org.codehaus.mojo.antlr.stubs;
  * under the License.
  */
 
-import org.apache.maven.artifact.handler.DefaultArtifactHandler;
+package org.codehaus.mojo.antlr;
+
+import java.io.File;
+
+import org.apache.maven.plugin.logging.Log;
 
 /**
- * @author <a href="mailto:vincent.siveton@gmail.com">Vincent Siveton</a>
- * @version $Id: DefaultArtifactHandlerStub.java 6588 2008-03-28 12:22:57Z bentmann $
+ * TODO : javadoc
+ * 
+ * @author Steve Ebersole
  */
-public class DefaultArtifactHandlerStub
-    extends DefaultArtifactHandler
+public interface Environment
 {
-    private String language;
+    public Log getLog();
 
-    /**
-     * @see org.apache.maven.artifact.handler.ArtifactHandler#getLanguage()
-     */
-    public String getLanguage()
-    {
-        if ( language == null )
-        {
-            language = "java";
-        }
+    public File getSourceDirectory();
 
-        return language;
-    }
-
-    /**
-     * @param language
-     */
-    public void setLanguage( String language )
-    {
-        this.language = language;
-    }
+    public File getOutputDirectory();
 }

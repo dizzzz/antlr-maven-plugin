@@ -1,1 +1,2 @@
-org.apache.maven.plugin-testing maven-plugin-testing-harness * *
+
+org.apache.maven.plugin-testing maven-plugin-testing-harness * * * *

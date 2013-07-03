@@ -23,7 +23,7 @@ import java.security.Permission;
 
 /**
  * @author <a href="mailto:vincent.siveton@gmail.com">Vincent Siveton</a>
- * @version $Id: NoExitSecurityManager.java 4581 2007-07-18 11:53:46Z vsiveton $
+ * @version $Id: NoExitSecurityManager.java 6588 2008-03-28 12:22:57Z bentmann $
  */
 public class NoExitSecurityManager
     extends SecurityManager

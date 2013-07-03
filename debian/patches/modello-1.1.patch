@@ -1,8 +1,6 @@
-Index: antlr-maven-plugin-2.1/pom.xml
-===================================================================
---- antlr-maven-plugin-2.1.orig/pom.xml	2008-03-06 21:57:20.000000000 +0000
-+++ antlr-maven-plugin-2.1/pom.xml	2012-01-10 16:08:31.000000000 +0000
-@@ -151,7 +151,7 @@
+--- a/pom.xml
++++ b/pom.xml
+@@ -132,7 +132,7 @@
          </executions>
          <configuration>
            <version>1.0.0</version>
@@ -10,18 +8,9 @@ Index: antlr-maven-plugin-2.1/pom.xml
 +          <models><model>src/main/mdo/antlrOptions.mdo</model></models>
          </configuration>
        </plugin>
-       <plugin>
-@@ -243,4 +243,4 @@
-       </build>
-     </profile>
-   </profiles>
--</project>
-\ No newline at end of file
-+</project>
-Index: antlr-maven-plugin-2.1/src/main/java/org/codehaus/mojo/antlr/AntlrHtmlReport.java
-===================================================================
---- antlr-maven-plugin-2.1.orig/src/main/java/org/codehaus/mojo/antlr/AntlrHtmlReport.java	2008-02-25 08:31:17.000000000 +0000
-+++ antlr-maven-plugin-2.1/src/main/java/org/codehaus/mojo/antlr/AntlrHtmlReport.java	2012-01-10 16:58:24.000000000 +0000
+     </plugins>
+--- a/src/main/java/org/codehaus/mojo/antlr/AntlrHtmlReport.java
++++ b/src/main/java/org/codehaus/mojo/antlr/AntlrHtmlReport.java
 @@ -25,8 +25,8 @@
  import java.util.List;
  import java.util.Locale;
@@ -32,7 +21,7 @@ Index: antlr-maven-plugin-2.1/src/main/java/org/codehaus/mojo/antlr/AntlrHtmlRep
  import org.apache.maven.doxia.siterenderer.sink.SiteRendererSink;
  import org.apache.maven.plugin.MojoExecutionException;
  import org.apache.maven.plugin.MojoFailureException;
-@@ -218,20 +218,11 @@
+@@ -217,20 +217,11 @@
      {
          try
          {
@@ -55,16 +44,3 @@ Index: antlr-maven-plugin-2.1/src/main/java/org/codehaus/mojo/antlr/AntlrHtmlRep
          catch ( MavenReportException e )
          {
              throw new MojoExecutionException( "An error has occurred in " + getName( Locale.ENGLISH )
-Index: antlr-maven-plugin-2.1/src/main/java/org/codehaus/mojo/antlr/AbstractAntlrMojo.java
-===================================================================
---- antlr-maven-plugin-2.1.orig/src/main/java/org/codehaus/mojo/antlr/AbstractAntlrMojo.java	2008-02-25 08:31:17.000000000 +0000
-+++ antlr-maven-plugin-2.1/src/main/java/org/codehaus/mojo/antlr/AbstractAntlrMojo.java	2012-01-10 16:08:31.000000000 +0000
-@@ -82,7 +82,7 @@
-     /**
-      * The maven project's helper.
-      *
--     * @parameter expression="${component.org.apache.maven.project.MavenProjectHelper}"
-+     * @component role="org.apache.maven.project.MavenProjectHelper"
-      * @required
-      * @readonly
-      */

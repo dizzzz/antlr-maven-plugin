@@ -28,7 +28,7 @@ import org.apache.maven.plugin.testing.stubs.MavenProjectStub;
 
 /**
  * @author <a href="mailto:vincent.siveton@gmail.com">Vincent Siveton</a>
- * @version $Id: JavaGrammarTestMavenProjectStub.java 4581 2007-07-18 11:53:46Z vsiveton $
+ * @version $Id: JavaGrammarTestMavenProjectStub.java 6588 2008-03-28 12:22:57Z bentmann $
  */
 public class JavaGrammarTestMavenProjectStub
     extends MavenProjectStub

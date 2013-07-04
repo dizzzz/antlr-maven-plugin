@@ -132,7 +132,7 @@
         </executions>
         <configuration>
           <version>1.0.0</version>
-          <model>src/main/mdo/antlrOptions.mdo</model>
+          <models><model>src/main/mdo/antlrOptions.mdo</model></models>
         </configuration>
       </plugin>
     </plugins>

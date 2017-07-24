@@ -239,6 +239,8 @@ public class MetadataExtracter
             Method getRHSMethod = helper.getAntlrOptionClass().getMethod( "getRHS", Helper.NO_ARG_SIGNATURE );
             getRHSMethod.setAccessible( true );
 
+            if (options == null) return;
+
             Object importVocabOption = getElementMethod.invoke( options, new Object[] { "importVocab" } );
             if ( importVocabOption != null )
             {

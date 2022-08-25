@@ -1,0 +1,2 @@
+  * Added a patch to fix a NPE when the grammar options are null
+    (http://jira.codehaus.org/browse/MANTLR-34)

@@ -1,0 +1,7 @@
+  * Depend on libmaven3-core-java instead of libmaven2-core-java
+  * Build with the DH sequencer instead of CDBS
+  * Removed the build dependencies on maven-clean-plugin, maven-jar-plugin,
+    maven-compiler-plugin and maven-site-plugin
+  * Moved the package to Git
+  * Standards-Version updated to 4.0.0
+  * Switch to debhelper level 10

@@ -1,0 +1,7 @@
+  * Team upload.
+  * Add Build-Depends on libmaven-plugin-tools-java. (Closes: #655371).
+  * Refresh modello-1.1.patch. (Closes: #643492).
+    Thanks to Daniel Schepler for contributing a fix for this bug.
+  * Bump Standards-Version to 3.9.2. No changes were required.
+  * Make copyright file DEP-5 compliant.
+  * Drop unnecessary B-D on quilt.

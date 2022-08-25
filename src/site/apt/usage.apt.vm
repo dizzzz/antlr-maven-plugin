@@ -24,7 +24,7 @@
 ~~ under the License.
 
 ~~ NOTE: For help with the syntax of this file, see:
-~~ http://maven.apache.org/guides/mini/guide-apt-format.html
+~~ http://maven.apache.org/doxia/references/apt-format.html
 
 Usage
 
@@ -44,6 +44,7 @@ Usage
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>antlr-maven-plugin</artifactId>
+        <version>${project.version}</version>
         <configuration>
           <!--
             Comma separated list of grammar files or pattern grammar files
@@ -80,6 +81,7 @@ mvn antlr:generate
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>antlr-maven-plugin</artifactId>
+        <version>${project.version}</version>
         <configuration>
           <!--
             Comma separated list of grammar files or pattern grammar files
@@ -119,6 +121,7 @@ mvn antlr:generate
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>antlr-maven-plugin</artifactId>
+        <version>${project.version}</version>
         <configuration>
           <!--
             Comma separated list of grammar files or pattern grammar files

@@ -1,4 +1,4 @@
-package org.codehaus.mojo.antlr.stubs;
+package org.codehaus.mojo.antlr.proxy;
 
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -19,35 +19,41 @@ package org.codehaus.mojo.antlr.stubs;
  * under the License.
  */
 
-import org.apache.maven.artifact.handler.DefaultArtifactHandler;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.codehaus.mojo.antlr.Environment;
 
 /**
- * @author <a href="mailto:vincent.siveton@gmail.com">Vincent Siveton</a>
- * @version $Id: DefaultArtifactHandlerStub.java 6588 2008-03-28 12:22:57Z bentmann $
+ * TODO : javadoc
+ * 
+ * @author Steve Ebersole
  */
-public class DefaultArtifactHandlerStub
-    extends DefaultArtifactHandler
+public class Tool
 {
-    private String language;
+    private final Environment environment;
 
-    /**
-     * @see org.apache.maven.artifact.handler.ArtifactHandler#getLanguage()
-     */
-    public String getLanguage()
+    private final Object antlrTool;
+
+    public Tool( Environment environment, Helper helper )
+        throws MojoExecutionException
     {
-        if ( language == null )
+        try
         {
-            language = "java";
+            antlrTool = helper.getAntlrToolClass().newInstance();
         }
-
-        return language;
+        catch ( Throwable t )
+        {
+            throw new MojoExecutionException( "Unable to instantiate antlr.Tool", t );
+        }
+        this.environment = environment;
     }
 
-    /**
-     * @param language
-     */
-    public void setLanguage( String language )
+    public Object getAntlrTool()
     {
-        this.language = language;
+        return antlrTool;
+    }
+
+    public Environment getEnvironment()
+    {
+        return environment;
     }
 }

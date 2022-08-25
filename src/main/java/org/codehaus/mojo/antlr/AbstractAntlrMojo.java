@@ -46,18 +46,26 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
+import org.apache.commons.exec.DefaultExecutor;
+import org.apache.commons.exec.CommandLine;
 import org.codehaus.mojo.antlr.options.Grammar;
+import org.codehaus.mojo.antlr.proxy.Helper;
+import org.codehaus.mojo.antlr.metadata.MetadataExtracter;
+import org.codehaus.mojo.antlr.metadata.XRef;
+import org.codehaus.mojo.antlr.plan.GenerationPlan;
+import org.codehaus.mojo.antlr.plan.GenerationPlanBuilder;
 import org.codehaus.plexus.util.StringOutputStream;
 import org.codehaus.plexus.util.StringUtils;
 
 /**
  * Base class with majority of Antlr functionalities.
- *
+ * 
  * @author <a href="mailto:vincent.siveton@gmail.com">Vincent Siveton</a>
- * @version $Id: AbstractAntlrMojo.java 6341 2008-02-25 08:31:17Z dholroyd $
+ * @version $Id: AbstractAntlrMojo.java 13111 2010-11-16 22:16:36Z pgier $
  */
 public abstract class AbstractAntlrMojo
     extends AbstractMojo
+    implements Environment
 {
     // ----------------------------------------------------------------------
     // Mojo parameters
@@ -65,25 +73,23 @@ public abstract class AbstractAntlrMojo
 
     /**
      * Specifies the Antlr directory containing grammar files.
-     *
-     * @parameter expression="${basedir}/src/main/antlr"
-     * @required
+     * 
+     * @parameter default-value="${basedir}/src/main/antlr"
      */
     protected File sourceDirectory;
 
     /**
      * The Maven Project Object
-     *
+     * 
      * @parameter expression="${project}"
-     * @required
+     * @readonly
      */
     protected MavenProject project;
 
     /**
      * The maven project's helper.
-     *
-     * @parameter expression="${component.org.apache.maven.project.MavenProjectHelper}"
-     * @required
+     * 
+     * @component role="org.apache.maven.project.MavenProjectHelper"
      * @readonly
      */
     private MavenProjectHelper projectHelper;
@@ -94,31 +100,27 @@ public abstract class AbstractAntlrMojo
     // ----------------------------------------------------------------------
 
     /**
-     * Specifies the destination directory where Antlr should generate files.
-     * <br/>
+     * Specifies the destination directory where Antlr should generate files. <br/>
      * See <a href="http://www.antlr2.org/doc/options.html#Command%20Line%20Options">Command Line Options</a>
-     *
-     * @parameter expression="${project.build.directory}/generated-sources/antlr"
-     * @required
+     * 
+     * @parameter default-value="${project.build.directory}/generated-sources/antlr"
      */
     protected File outputDirectory;
 
     /**
      * Comma separated grammar file names or grammar pattern file names present in the <code>sourceDirectory</code>
-     * directory.
-     * <br/>
+     * directory. <br/>
      * See <a href="http://www.antlr2.org/doc/options.html#Command%20Line%20Options">Command Line Options</a>
-     *
+     * 
      * @parameter expression="${grammars}"
      */
     protected String grammars;
 
     /**
-     * Grammar list presents in the <code>sourceDirectory</code> directory.
-     * <br/>
-     * See <a href="http://www.antlr2.org/doc/options.html#Command%20Line%20Options">Command Line Options</a>
-     * <br/>
+     * Grammar list presents in the <code>sourceDirectory</code> directory. <br/>
+     * See <a href="http://www.antlr2.org/doc/options.html#Command%20Line%20Options">Command Line Options</a> <br/>
      * Example:
+     * 
      * <pre>
      * &lt;grammarDefs&gt;<br/>
      *   &lt;grammar&gt;<br/>
@@ -127,64 +129,68 @@ public abstract class AbstractAntlrMojo
      *   &lt;/grammar&gt;<br/>
      * &lt;/grammarDefs&gt;
      * </pre>
-     *
+     * 
      * @parameter expression="${grammarDefs}"
      */
     protected Grammar[] grammarDefs;
 
     /**
-     * Launch the ParseView debugger upon parser invocation.
-     * <br/>
+     * Launch the ParseView debugger upon parser invocation. <br/>
      * See <a href="http://www.antlr2.org/doc/options.html#Command%20Line%20Options">Command Line Options</a>
-     *
+     * 
      * @parameter expression="${debug}" default-value="false"
      */
     private boolean debug;
 
     /**
-     * Generate a text file from your grammar with a lot of debugging info.
-     * <br/>
+     * Generate a text file from your grammar with a lot of debugging info. <br/>
      * See <a href="http://www.antlr2.org/doc/options.html#Command%20Line%20Options">Command Line Options</a>
-     *
+     * 
      * @parameter expression="${diagnostic}" default-value="false"
      */
     private boolean diagnostic;
 
     /**
-     * Have all rules call traceIn/traceOut.
-     * <br/>
+     * Have all rules call traceIn/traceOut. <br/>
      * See <a href="http://www.antlr2.org/doc/options.html#Command%20Line%20Options">Command Line Options</a>
-     *
+     * 
      * @parameter expression="${trace}" default-value="false"
      */
     private boolean trace;
 
     /**
-     * Have parser rules call traceIn/traceOut.
-     * <br/>
+     * Have parser rules call traceIn/traceOut. <br/>
      * See <a href="http://www.antlr2.org/doc/options.html#Command%20Line%20Options">Command Line Options</a>
-     *
+     * 
      * @parameter expression="${traceParser}" default-value="false"
      */
     private boolean traceParser;
 
     /**
-     * Have lexer rules call traceIn/traceOut.
-     * <br/>
+     * Have lexer rules call traceIn/traceOut. <br/>
      * See <a href="http://www.antlr2.org/doc/options.html#Command%20Line%20Options">Command Line Options</a>
-     *
+     * 
      * @parameter expression="${traceLexer}" default-value="false"
      */
     private boolean traceLexer;
 
     /**
-     * Have tree rules call traceIn/traceOut.
-     * <br/>
+     * Have tree rules call traceIn/traceOut. <br/>
      * See <a href="http://www.antlr2.org/doc/options.html#Command%20Line%20Options">Command Line Options</a>
-     *
+     * 
      * @parameter expression="${traceTreeParser}" default-value="false"
      */
     private boolean traceTreeParser;
+
+    public File getSourceDirectory()
+    {
+        return sourceDirectory;
+    }
+
+    public File getOutputDirectory()
+    {
+        return outputDirectory;
+    }
 
     /**
      * @throws MojoExecutionException
@@ -194,225 +200,256 @@ public abstract class AbstractAntlrMojo
     {
         validateParameters();
 
-		// ----------------------------------------------------------------------
-		// Find the Antlr dependency to use for generation
-		// ----------------------------------------------------------------------
+        Artifact antlrArtifact = locateAntlrArtifact();
+        MetadataExtracter metadataExtracter = new MetadataExtracter( this, new Helper( antlrArtifact ) );
+        XRef metadata = metadataExtracter.processMetadata( getGrammars() );
 
-		Artifact antlrArtifact = null;
-		if ( project.getCompileArtifacts() != null ) {
-			Iterator projectArtifacts = project.getCompileArtifacts().iterator();
-			while ( projectArtifacts.hasNext() ) {
-				final Artifact artifact = ( Artifact ) projectArtifacts.next();;
-				if ( "antlr".equals( artifact.getGroupId() ) &&
-						( "antlr".equals( artifact.getArtifactId() ) || "antlr-all".equals( artifact.getArtifactId() ) ) ) {
-					antlrArtifact = artifact;
-					break;
-				}
-			}
-		}
-		if ( antlrArtifact == null ) {
-			throw new NoAntlrDependencyDefinedException( "project did not define antlr:antlr depenency" );
-		}
-		// TODO : enforce specific version range; e.g. [2.7,3.0) ???
-
-		// ----------------------------------------------------------------------
-        // Call Antlr for each grammar
-        // ----------------------------------------------------------------------
-
-        Grammar[] grammarsUsed = getGrammars();
-
-        for ( int i = 0; i < grammarsUsed.length; i++ )
+        Iterator generationPlans = new GenerationPlanBuilder( this ).buildGenerationPlans( metadata ).iterator();
+        while ( generationPlans.hasNext() )
         {
-            String grammarName = grammarsUsed[i].getName();
-
-            if ( StringUtils.isEmpty( grammarName ) )
+            final GenerationPlan plan = (GenerationPlan) generationPlans.next();
+            if ( !plan.isOutOfDate() )
             {
-                getLog().info( "Empty grammar in the configuration. Skipped." );
+                getLog().info( "grammar [" + plan.getId() + "] was up-to-date; skipping" );
                 continue;
             }
 
-            File grammar = new File( sourceDirectory, grammarName.trim() );
-
-            if ( !grammar.exists() )
-            {
-                throw new MojoExecutionException( "The grammar '" + grammar.getAbsolutePath() + "' doesnt exist." );
-            }
-
-            getLog().info( "Using Antlr grammar: " + grammar );
-
-            File generated = null;
-            try
-            {
-                generated = getGeneratedFile( grammar.getPath(), outputDirectory );
-            }
-            catch ( IOException e )
-            {
-                throw new MojoExecutionException( "Failed to get generated file: " + e.getMessage(), e );
-            }
-
-            if ( generated.exists() )
-            {
-                if ( generated.lastModified() > grammar.lastModified() )
-                {
-                    // it's more recent, skip.
-                    getLog().info( "The grammar is already generated." );
-                    continue;
-                }
-            }
-
-            if ( !generated.getParentFile().exists() )
-            {
-                generated.getParentFile().mkdirs();
-            }
-
-            // ----------------------------------------------------------------------
-            // Wrap arguments
-            // Note: grammar file should be last
-            // ----------------------------------------------------------------------
-
-            List arguments = new LinkedList();
-            addArgIf( arguments, debug, "-debug" );
-            addArgIf( arguments, diagnostic, "-diagnostic" );
-            addArgIf( arguments, trace, "-trace" );
-            addArgIf( arguments, traceParser, "-traceParser" );
-            addArgIf( arguments, traceLexer, "-traceLexer" );
-            addArgIf( arguments, traceTreeParser, "-traceTreeParser" );
-            addArgs( arguments );
-            arguments.add( "-o" );
-            arguments.add( generated.getParentFile().getPath() );
-            if ( StringUtils.isNotEmpty( grammarsUsed[i].getGlib() ) )
-            {
-                StringBuffer glib = new StringBuffer();
-                StringTokenizer st = new StringTokenizer( grammarsUsed[i].getGlib(), ",; " );
-                while ( st.hasMoreTokens() )
-                {
-                    glib.append( new File( sourceDirectory, st.nextToken().trim() ) );
-                    if ( st.hasMoreTokens() )
-                    {
-                        glib.append( ";" );
-                    }
-                }
-                arguments.add( "-glib" );
-                arguments.add( glib.toString() );
-            }
-            arguments.add( grammar.getPath() );
-
-            String[] args = (String[]) arguments.toArray( new String[0] );
-
-            if ( getLog().isDebugEnabled() )
-            {
-                getLog().debug( "antlr args=\n" + StringUtils.join( args, "\n" ) );
-            }
-
-            // ----------------------------------------------------------------------
-            // Call Antlr
-            // ----------------------------------------------------------------------
-
-			boolean failedSetManager = false;
-            SecurityManager oldSm = null;
-            try
-            {
-                oldSm = System.getSecurityManager();
-                System.setSecurityManager( NoExitSecurityManager.INSTANCE );
-            }
-            catch ( SecurityException ex )
-            {
-                //ANTLR-12
-                oldSm = null;
-                failedSetManager = true;
-                //ignore, in embedded environment the security manager can already be set.
-                // in such a case assume the exit call is handled properly..
-                getLog().warn(
-                               "Cannot set custom SecurityManager. "
-                                   + "Antlr's call to System.exit() can cause application shutdown "
-                                   + "if not handled by the current SecurityManager." );
-            }
-
-            PrintStream oldErr = System.err;
-
-            OutputStream errOS = new StringOutputStream();
-            PrintStream err = new PrintStream( errOS );
-            System.setErr( err );
-
-            try
-            {
-				executeAntlrInIsolatedClassLoader( (String[]) arguments.toArray( new String[0] ), antlrArtifact );
-            }
-            catch ( SecurityException e )
-            {
-                if ( e.getMessage().equals( "exitVM-0" )
-                    || e.getClass().getName().equals( "org.netbeans.core.execution.ExitSecurityException" ) ) //netbeans IDE Sec Manager.
-                {
-                    //ANTLR-12
-                    //now basically every secutiry manager could set different message, how to handle in generic way?
-                    //probably only by external execution
-                    /// in case of NetBeans SecurityManager, it's not possible to distinguish exit codes, rather swallow than fail.
-                    getLog().debug( e );
-                }
-                else
-                {
-                    throw new MojoExecutionException( "Antlr execution failed: " + e.getMessage()
-                        + "\n Error output:\n" + errOS, e );
-                }
-            }
-            finally
-            {
-                if ( !failedSetManager )
-                {
-                    System.setSecurityManager( oldSm );
-                }
-                System.setErr( oldErr );
-
-                System.err.println( errOS.toString() );
-            }
+            getLog().info( "performing grammar generation [" + plan.getId() + "]" );
+            performGeneration( plan, antlrArtifact );
         }
 
         if ( project != null )
         {
-            projectHelper.addResource( project, outputDirectory.getAbsolutePath(), Collections
-                .singletonList( "**/**.txt" ), new ArrayList() );
+            projectHelper.addResource( project, outputDirectory.getAbsolutePath(),
+                                       Collections.singletonList( "**/**.txt" ), new ArrayList() );
             project.addCompileSourceRoot( outputDirectory.getAbsolutePath() );
         }
     }
 
+    protected final Artifact locateAntlrArtifact()
+        throws NoAntlrDependencyDefinedException
+    {
+        Artifact antlrArtifact = null;
+        if ( project.getCompileArtifacts() != null )
+        {
+            Iterator projectArtifacts = project.getCompileArtifacts().iterator();
+            while ( projectArtifacts.hasNext() )
+            {
+                final Artifact artifact = (Artifact) projectArtifacts.next();
+                if ( "antlr".equals( artifact.getGroupId() )
+                    && ( "antlr".equals( artifact.getArtifactId() ) || "antlr-all".equals( artifact.getArtifactId() ) ) )
+                {
+                    antlrArtifact = artifact;
+                    break;
+                }
+            }
+        }
+        if ( antlrArtifact == null )
+        {
+            throw new NoAntlrDependencyDefinedException( "project did not define antlr:antlr depenency" );
+        }
+        // TODO : enforce specific version range; e.g. [2.7,3.0) ???
+        return antlrArtifact;
+    }
 
-	private void executeAntlrInIsolatedClassLoader(String[] args, Artifact antlrArtifact) throws MojoExecutionException {
-		try {
-			URLClassLoader classLoader = new URLClassLoader(
-					new URL[] { antlrArtifact.getFile().toURL() },
-					ClassLoader.getSystemClassLoader()
-			);
+    protected void performGeneration( GenerationPlan plan, Artifact antlrArtifact )
+        throws MojoExecutionException
+    {
+        if ( !plan.getGenerationDirectory().getParentFile().exists() )
+        {
+            plan.getGenerationDirectory().getParentFile().mkdirs();
+        }
 
-			Class toolClass = classLoader.loadClass( "antlr.Tool" );
-			toolClass.getMethod( "main", new Class[] { String[].class } ).invoke( null, new Object[] { args } );
-		}
-		catch ( MalformedURLException e ) {
-			throw new MojoExecutionException( "Unable to resolve antlr:antlr artifact url", e );
-		}
-		catch ( ClassNotFoundException e ) {
-			throw new MojoExecutionException( "could not locate antlr.Tool class" );
-		}
-		catch ( NoSuchMethodException e ) {
-			throw new MojoExecutionException( "error locating antlt.Tool#main", e );
-		}
-		catch ( InvocationTargetException e ) {
-			throw new MojoExecutionException( "error perforing antlt.Tool#main", e.getTargetException() );
-		}
-		catch ( IllegalAccessException e ) {
-			throw new MojoExecutionException( "error perforing antlt.Tool#main", e );
-		}
-	}
+        // ----------------------------------------------------------------------
+        // Wrap arguments
+        // Note: grammar file should be last
+        // ----------------------------------------------------------------------
 
-	/**
+        List arguments = new LinkedList();
+        addArgIf( arguments, debug, "-debug" );
+        addArgIf( arguments, diagnostic, "-diagnostic" );
+        addArgIf( arguments, trace, "-trace" );
+        addArgIf( arguments, traceParser, "-traceParser" );
+        addArgIf( arguments, traceLexer, "-traceLexer" );
+        addArgIf( arguments, traceTreeParser, "-traceTreeParser" );
+
+        addArgs( arguments );
+
+        arguments.add( "-o" );
+        arguments.add( plan.getGenerationDirectory().getPath() );
+
+        if ( plan.getCollectedSuperGrammarIds().size() > 0 )
+        {
+            arguments.add( "-glib" );
+            StringBuffer buffer = new StringBuffer();
+            Iterator ids = plan.getCollectedSuperGrammarIds().iterator();
+            while ( ids.hasNext() )
+            {
+                buffer.append( new File( sourceDirectory, (String) ids.next() ) );
+                if ( ids.hasNext() )
+                {
+                    buffer.append( ';' );
+                }
+            }
+            arguments.add( buffer.toString() );
+        }
+
+        arguments.add( plan.getSource().getPath() );
+
+        String[] args = (String[]) arguments.toArray( new String[arguments.size()] );
+
+        if ( plan.getImportVocabTokenTypesDirectory() != null
+            && !plan.getImportVocabTokenTypesDirectory().equals( plan.getGenerationDirectory() ) )
+        {
+            // we need to spawn a new process to properly set up PWD
+            CommandLine commandLine = new CommandLine( "java" );
+            commandLine.addArgument( "-classpath", false );
+            commandLine.addArgument( generateClasspathForProcessSpawning( antlrArtifact ), true );
+            commandLine.addArgument( "antlr.Tool", false );
+            commandLine.addArguments( args, true );
+            DefaultExecutor executor = new DefaultExecutor();
+            executor.setWorkingDirectory( plan.getImportVocabTokenTypesDirectory() );
+            try
+            {
+                executor.execute( commandLine );
+            }
+            catch ( IOException e )
+            {
+                getLog().warn( "Error spawning process to execute antlr tool : " + e.getMessage() );
+            }
+
+            return;
+        }
+
+        // ----------------------------------------------------------------------
+        // Call Antlr
+        // ----------------------------------------------------------------------
+
+        if ( getLog().isDebugEnabled() )
+        {
+            getLog().debug( "antlr args=\n" + StringUtils.join( args, "\n" ) );
+        }
+
+        boolean failedSetManager = false;
+        SecurityManager oldSm = null;
+        try
+        {
+            oldSm = System.getSecurityManager();
+            System.setSecurityManager( NoExitSecurityManager.INSTANCE );
+        }
+        catch ( SecurityException ex )
+        {
+            // ANTLR-12
+            oldSm = null;
+            failedSetManager = true;
+            // ignore, in embedded environment the security manager can already be set.
+            // in such a case assume the exit call is handled properly..
+            getLog().warn( "Cannot set custom SecurityManager. "
+                               + "Antlr's call to System.exit() can cause application shutdown "
+                               + "if not handled by the current SecurityManager." );
+        }
+
+        String originalUserDir = null;
+        if ( plan.getImportVocabTokenTypesDirectory() != null )
+        {
+            originalUserDir = System.getProperty( "user.dir" );
+            System.setProperty( "user.dir", plan.getImportVocabTokenTypesDirectory().getPath() );
+        }
+
+        PrintStream oldErr = System.err;
+
+        OutputStream errOS = new StringOutputStream();
+        PrintStream err = new PrintStream( errOS );
+        System.setErr( err );
+
+        try
+        {
+            executeAntlrInIsolatedClassLoader( (String[]) arguments.toArray( new String[0] ), antlrArtifact );
+        }
+        catch ( SecurityException e )
+        {
+            if ( e.getMessage().equals( "exitVM-0" )
+                || e.getClass().getName().equals( "org.netbeans.core.execution.ExitSecurityException" ) ) // netbeans
+                                                                                                          // IDE Sec
+                                                                                                          // Manager.
+            {
+                // ANTLR-12
+                // now basically every secutiry manager could set different message, how to handle in generic way?
+                // probably only by external execution
+                // / in case of NetBeans SecurityManager, it's not possible to distinguish exit codes, rather swallow
+                // than fail.
+                getLog().debug( e );
+            }
+            else
+            {
+                throw new MojoExecutionException( "Antlr execution failed: " + e.getMessage() + "\n Error output:\n"
+                    + errOS, e );
+            }
+        }
+        finally
+        {
+            if ( originalUserDir != null )
+            {
+                System.setProperty( "user.dir", originalUserDir );
+            }
+            if ( !failedSetManager )
+            {
+                System.setSecurityManager( oldSm );
+            }
+            System.setErr( oldErr );
+            System.err.println( errOS.toString() );
+        }
+    }
+
+    private String generateClasspathForProcessSpawning( Artifact antlrArtifact )
+    {
+        // todo : is maven by itself enough for the generation???
+        return antlrArtifact.getFile().getPath();
+    }
+
+    private void executeAntlrInIsolatedClassLoader( String[] args, Artifact antlrArtifact )
+        throws MojoExecutionException
+    {
+        try
+        {
+            URLClassLoader classLoader =
+                new URLClassLoader( new URL[] { antlrArtifact.getFile().toURL() }, ClassLoader.getSystemClassLoader() );
+
+            Class toolClass = classLoader.loadClass( "antlr.Tool" );
+            toolClass.getMethod( "main", new Class[] { String[].class } ).invoke( null, new Object[] { args } );
+        }
+        catch ( MalformedURLException e )
+        {
+            throw new MojoExecutionException( "Unable to resolve antlr:antlr artifact url", e );
+        }
+        catch ( ClassNotFoundException e )
+        {
+            throw new MojoExecutionException( "could not locate antlr.Tool class" );
+        }
+        catch ( NoSuchMethodException e )
+        {
+            throw new MojoExecutionException( "error locating antlt.Tool#main", e );
+        }
+        catch ( InvocationTargetException e )
+        {
+            throw new MojoExecutionException( "error perforing antlt.Tool#main", e.getTargetException() );
+        }
+        catch ( IllegalAccessException e )
+        {
+            throw new MojoExecutionException( "error perforing antlt.Tool#main", e );
+        }
+    }
+
+    /**
      * Add arguments to be included in Antlr call
-     *
+     * 
      * @param arguments
      */
     protected abstract void addArgs( List arguments );
 
     /**
      * Convenience method to add an argument
-     *
+     * 
      * @param arguments
      * @param b
      * @param value
@@ -487,7 +524,7 @@ public abstract class AbstractAntlrMojo
 
     /**
      * grammars or grammarDefs parameters is required
-     *
+     * 
      * @throws MojoExecutionException
      */
     private void validateParameters()
@@ -510,16 +547,11 @@ public abstract class AbstractAntlrMojo
     }
 
     /**
-     * Get the list of all grammars to be compiled. The grammars variable
-     * can be a list of file or patterns. For instance, one can use *.g instead of
-     * a full list of grammar names.
-     *
-     * Be aware that sometime the grammar order is important, and that patterns won't
-     * keep this order, but we can still combine both elements( ordered names first, then
-     * the patterns).
-     *
-     * File name won't be added twice in the list of files.
-     *
+     * Get the list of all grammars to be compiled. The grammars variable can be a list of file or patterns. For
+     * instance, one can use *.g instead of a full list of grammar names. Be aware that sometime the grammar order is
+     * important, and that patterns won't keep this order, but we can still combine both elements( ordered names first,
+     * then the patterns). File name won't be added twice in the list of files.
+     * 
      * @return an array of grammar from <code>grammars</code> and <code>grammarDefs</code> variables
      */
     private Grammar[] getGrammars()
@@ -542,8 +574,9 @@ public abstract class AbstractAntlrMojo
                     {
                         // We first have to 'protect' the '.', and transform patterns
                         // to regexp, substituting '*' to '.*' and '?' to '.'
-                        final String transformedGrammar = currentGrammar.replaceAll( "\\.", "\\\\." )
-                            .replaceAll( "\\*", ".*" ).replaceAll( "\\?", "." );
+                        final String transformedGrammar =
+                            currentGrammar.replaceAll( "\\.", "\\\\." ).replaceAll( "\\*", ".*" ).replaceAll( "\\?",
+                                                                                                              "." );
 
                         // Filter the source directory
                         String[] dir = sourceDirectory.list( new FilenameFilter()
@@ -592,9 +625,12 @@ public abstract class AbstractAntlrMojo
         return (Grammar[]) grammarList.toArray( new Grammar[0] );
     }
 
-	public static class NoAntlrDependencyDefinedException extends MojoExecutionException {
-		public NoAntlrDependencyDefinedException(String s) {
-			super( s );
-		}
-	}
+    public static class NoAntlrDependencyDefinedException
+        extends MojoExecutionException
+    {
+        public NoAntlrDependencyDefinedException( String s )
+        {
+            super( s );
+        }
+    }
 }

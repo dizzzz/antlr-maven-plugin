@@ -1,0 +1,4 @@
+  * Fixed the build failure with doxia 1.11
+  * Use salsa.debian.org Vcs-* URLs
+  * Standards-Version updated to 4.6.2
+  * Switch to debhelper level 13

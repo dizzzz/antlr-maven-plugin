@@ -1,7 +1,8 @@
 Source: antlr-maven-plugin
 Section: java
 Priority: optional
-Maintainer: Debian Java Maintainers <pkg-java-maintainers@lists.alioth.debian.org>
+Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
+XSBC-Original-Maintainer: Debian Java Maintainers <pkg-java-maintainers@lists.alioth.debian.org>
 Uploaders:
  Ludovic Claude <ludovic.claude@laposte.net>,
  Torsten Werner <twerner@debian.org>,

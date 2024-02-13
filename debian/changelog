@@ -1,3 +1,11 @@
+antlr-maven-plugin (2.2-5ubuntu1) noble; urgency=medium
+
+  * d/p/security-manager.patch: catch UnsupportedOperationException
+    thrown by Java 21 setSecurityManager() method to resolve ftbfs
+    (LP: #2052993).
+
+ -- Vladimir Petko <vladimir.petko@canonical.com>  Tue, 13 Feb 2024 17:45:22 +1300
+
 antlr-maven-plugin (2.2-5) unstable; urgency=medium
 
   * Fixed the build failure with doxia 1.11

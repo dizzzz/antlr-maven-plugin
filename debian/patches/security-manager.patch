@@ -1,0 +1,23 @@
+Description: catch SecurityManager exception
+ When Java 21 is called without -Djava.security.manager property,
+ UnsupportedOperationException is thrown in setSecurityManager() method.
+ The plugin uses Security Manager to avoid shutting down Java machine on error,
+ but gracefully handles situation when it can not be set.
+ The patch is not forwarded as upstream is no longer available, but the
+ plugin is still used by reverse build dependencies.
+Author: Vladimir Petko <vladimir.petko@canonical.com>
+Bug-Ubuntu: https://bugs.launchpad.net/ubuntu/+source/antlr-maven-plugin/+bug/2052993
+Bug-Debian: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1053206
+Forwarded: not-needed
+Last-Update: 2024-02-13
+--- a/src/main/java/org/codehaus/mojo/antlr/AbstractAntlrMojo.java
++++ b/src/main/java/org/codehaus/mojo/antlr/AbstractAntlrMojo.java
+@@ -337,7 +337,7 @@
+             oldSm = System.getSecurityManager();
+             System.setSecurityManager( NoExitSecurityManager.INSTANCE );
+         }
+-        catch ( SecurityException ex )
++        catch ( UnsupportedOperationException | SecurityException ex )
+         {
+             // ANTLR-12
+             oldSm = null;

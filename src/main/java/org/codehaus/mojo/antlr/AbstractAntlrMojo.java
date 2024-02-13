@@ -337,7 +337,7 @@ public abstract class AbstractAntlrMojo
             oldSm = System.getSecurityManager();
             System.setSecurityManager( NoExitSecurityManager.INSTANCE );
         }
-        catch ( SecurityException ex )
+        catch ( UnsupportedOperationException | SecurityException ex )
         {
             // ANTLR-12
             oldSm = null;

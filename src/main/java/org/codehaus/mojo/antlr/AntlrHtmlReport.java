@@ -25,7 +25,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
-import org.apache.maven.doxia.sink.render.RenderingContext;
+import org.apache.maven.doxia.siterenderer.RenderingContext;
 import org.apache.maven.doxia.siterenderer.Renderer;
 import org.apache.maven.doxia.siterenderer.sink.SiteRendererSink;
 import org.apache.maven.plugin.MojoExecutionException;
